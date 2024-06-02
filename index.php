@@ -1,5 +1,35 @@
 <?php
+// Get connection
+include 'db.php';
 
+// Handling form submissions
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $action = $_POST['submit_action'];
+
+    if ($action == 'register') {
+      // Check if account already exists
+
+      // Hash the password before storing it
+      $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+      // Prepare the SQL statement
+      $stmt = $db->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
+      
+      // Bind the values to the placeholders
+      $stmt->bindValue(':email', $email);
+      $stmt->bindValue(':password', $hashedPassword);
+
+      // Execute the statement
+      $result = $stmt->execute();
+
+      // Check if the insert was successful
+      
+    } elseif ($action == 'login') {
+      
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +52,7 @@
       </form>
     </div>
       <div class="intro bg-blur">
-        <h1 style="text-align:center;">[ Welcome to Tournoi ]</h1>
+        <a href="http://localhost:1234/index.php"><h1 style="text-align:center;">[ Welcome to Tournoi ]</h1></a>
         <p style="text-align:center;">#️⃣ 🎠 🔃 🉐 👍 🎎 🐙 👐 🏥 🎋 🔗 ⚖ ❄️</p>
         <p>Cette application web sert a créer des tournois ou les participants on le droit de:</p>
         <ul>
