@@ -7,25 +7,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
     $action = $_POST['submit_action'];
-
+  
     if ($action == 'register') {
-      // Check if account already exists
+        // Check if the user already exists
+        $stmt = $db->prepare('SELECT email FROM users WHERE email = :email');
+        $stmt->bindValue(':email', $email);
+        $result = $stmt->execute();
 
-      // Hash the password before storing it
-      $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        if ($result) {
+            // Fetch the first row
+            $existingUser = $result->fetchArray(SQLITE3_ASSOC);
+            
+            if ($existingUser) {
+                // User already exists
+                echo "This email is already registered."; 
+            } else {
+                // Hash the password before storing it
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-      // Prepare the SQL statement
-      $stmt = $db->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
-      
-      // Bind the values to the placeholders
-      $stmt->bindValue(':email', $email);
-      $stmt->bindValue(':password', $hashedPassword);
+                // Prepare the SQL statement for registration
+                $stmt = $db->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
+                
+                // Bind the values to the placeholders
+                $stmt->bindValue(':email', $email);
+                $stmt->bindValue(':password', $hashedPassword);
 
-      // Execute the statement
-      $result = $stmt->execute();
+                // Execute the statement
+                $result = $stmt->execute();
 
-      // Check if the insert was successful
-      
+                // Check if the insert was successful
+                if ($result) {
+                    echo "Registration successful for email: " . htmlspecialchars($email);
+                } else {
+                    echo "Registration failed.";
+                }
+          }
+    }
     } elseif ($action == 'login') {
       
     }
